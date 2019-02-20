@@ -17,6 +17,7 @@ use yii\base\InvalidConfigException;
  *             'levels' => ['error'],
  *             'botToken' => '123456:abcde', // bot token secret key
  *             'chatId' => '123456', // chat id or channel username with @ like 12345 or @channel
+ *             'proxy' => 'tcp://some.proxy.com:port', // some proxy
  *         ],
  *     ],
  * ],
@@ -37,6 +38,12 @@ class TelegramTarget extends Target
      * @var int|string
      */
     public $chatId;
+    
+    /**
+     * Some proxy name with protocol and port
+     * @var string
+     */
+    public $proxy;
 
     /**
      * Check required properties
@@ -57,7 +64,7 @@ class TelegramTarget extends Target
      */
     public function export()
     {
-        $bot = new TelegramBot(['token' => $this->botToken]);
+        $bot = new TelegramBot(['token' => $this->botToken, 'proxy' => $this->proxy]);
 
         $messages = array_map([$this, 'formatMessage'], $this->messages);
 
