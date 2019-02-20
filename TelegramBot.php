@@ -20,6 +20,12 @@ class TelegramBot extends Component
      */
     public $token;
     
+     /**
+     * Some proxy name with protocol and port
+     * @var string
+     */
+    public $proxy;
+    
     private $_client;
 
     /**
@@ -59,9 +65,22 @@ class TelegramBot extends Component
      */
     public function sendMessage($chat_id, $text, $parse_mode = null, $disable_web_page_preview = null, $disable_notification = null, $reply_to_message_id = null, $reply_markup = null)
     {
-        $response = $this->getClient()
-            ->post('sendMessage', compact('chat_id', 'text', 'parse_mode', 'disable_web_page_preview', 'disable_notification', 'reply_to_message_id', 'reply_markup'))
-            ->send();
+        if(!empty($this->proxy))
+        {
+            $response = $this->getClient()
+                ->post('sendMessage', compact('chat_id', 'text', 'parse_mode', 'disable_web_page_preview', 'disable_notification', 'reply_to_message_id', 'reply_markup'))
+                ->setOptions([
+                    'proxy' => $this->proxy, // use a Proxy
+                    'timeout' => 5, // set timeout to 5 seconds for the case server is not responding
+                ])
+                ->send();
+        }
+        else
+        {
+            $response = $this->getClient()
+                ->post('sendMessage', compact('chat_id', 'text', 'parse_mode', 'disable_web_page_preview', 'disable_notification', 'reply_to_message_id', 'reply_markup'))
+                ->send();
+        }
         return $response->data;
     }
 }
